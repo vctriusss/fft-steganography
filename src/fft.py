@@ -13,24 +13,20 @@ from src.utils import (
 
 def embed(img: Image, text: str) -> Image:
     img = normalize_image(np.asarray(img))
-    text_img = text_to_image(text, (img.shape[1], img.shape[0] // 2))
+    embedding_zone_shape = (img.shape[0] // 2, img.shape[1])
+    
+    text_img = text_to_image(text, embedding_zone_shape)
     text_img = normalize_image(np.asarray(text_img))
     
     img_fft = np.fft.fft2(img, None, (0, 1))
     
-    embedding_zone = np.zeros((img.shape[0] // 2, 
-                               img.shape[1], 
-                               3))
-
-    embedding_zone[:text_img.shape[0], :text_img.shape[1]] = text_img
-    
     _, low, high = centralize(img_fft)
     alpha = high - low
     
-    xmap = get_xmap(embedding_zone.shape)
+    xmap = get_xmap(embedding_zone_shape)
     
-    img_fft[xmap[0], xmap[1]] += embedding_zone * alpha
-    img_fft[-xmap[0], -xmap[1]] += embedding_zone * alpha
+    img_fft[xmap[0], xmap[1]] += text_img * alpha
+    img_fft[-xmap[0], -xmap[1]] += text_img * alpha
     
     img_inv = np.fft.ifft2(img_fft, None, (0, 1)).real
     

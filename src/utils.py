@@ -9,6 +9,8 @@ MONOSPACE_FONT_RATIO = 0.6
 
 
 def text_to_image(text: str, shape: tuple[int, int]) -> Image:
+    shape = (shape[1], shape[0])
+    
     font_size = shape[0] // int(CHARS_PER_ROW * MONOSPACE_FONT_RATIO)
     n_rows = shape[1] // font_size
 
